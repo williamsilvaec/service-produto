@@ -1,5 +1,13 @@
 package com.williamsilva.serviceproduto.http;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.williamsilva.serviceproduto.http.data.request.ProdutoPersistDto;
 import com.williamsilva.serviceproduto.model.Produto;
 import com.williamsilva.serviceproduto.service.ProdutoService;
@@ -23,7 +31,7 @@ public class ProdutoControllerImpl implements ProdutoController {
     @ResponseStatus(HttpStatus.CREATED)
     public Produto inserir(@RequestBody @Valid ProdutoPersistDto dto) {
         Produto produto = new Produto(dto.getDescricao(), dto.getValor());
-        return produtoService.inserir(produto);
+        return produtoService.save(produto);
     }
 
     @Override
@@ -32,4 +40,65 @@ public class ProdutoControllerImpl implements ProdutoController {
         return produtoService.one(produtoId);
     }
 
+    @Override
+    @PatchMapping("{id}")
+    public Produto update(@PathVariable("id") Long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException {
+        Produto produto = produtoService.one(id);
+
+        ObjectMapper objectMapper = new ObjectMapper()
+                .disable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
+                .enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)
+                .setNodeFactory(JsonNodeFactory.withExactBigDecimals(true));
+
+        JsonNode produtoJsonNode = objectMapper.convertValue(produto, JsonNode.class);
+        JsonNode patchJsonNode = patch.apply(produtoJsonNode);
+        Produto produtoPersist = objectMapper.treeToValue(patchJsonNode, Produto.class);
+
+        return produtoService.save(produtoPersist);
+    }
+
+    @Override
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable("id") Long id) {
+        produtoService.delete(id);
+    }
+
+    @Override
+    @PutMapping("{id}")
+    public Produto updateAll(@PathVariable("id") Long id, @RequestBody @Valid ProdutoPersistDto dto) {
+        Produto produto = new Produto(id, dto.getDescricao(), dto.getValor());
+        return produtoService.update(produto);
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

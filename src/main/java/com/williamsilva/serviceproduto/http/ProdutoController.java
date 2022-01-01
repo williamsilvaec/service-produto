@@ -1,5 +1,8 @@
 package com.williamsilva.serviceproduto.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.williamsilva.serviceproduto.http.data.request.ProdutoPersistDto;
 import com.williamsilva.serviceproduto.model.Produto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,4 +41,14 @@ public interface ProdutoController {
     })
     @GetMapping("{id}")
     Produto buscar(@PathVariable("id") Long produtoId);
+
+    @PatchMapping("{id}")
+    Produto update(@PathVariable("id") Long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException;
+
+    @DeleteMapping("{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void delete(@PathVariable("id") Long id);
+
+    @PutMapping("{id}")
+    Produto updateAll(@PathVariable("id") Long id, @RequestBody @Valid ProdutoPersistDto dto);
 }
