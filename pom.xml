@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.williamsilva</groupId>
     <artifactId>service-produto</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>service-produto</name>
     <description>service-produto</description>
     <properties>
@@ -87,6 +87,25 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.1.4</version>
+                <configuration>
+                    <from>
+                        <image>openjdk:17-jdk-slim-buster</image>
+                    </from>
+                    <to>
+                        <image>williamsilvaec/service-produto:${version}</image>
+                    </to>
+                    <container>
+                        <mainClass>com.williamsilva.serviceproduto.ServiceProdutoApplication</mainClass>
+                    </container>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
